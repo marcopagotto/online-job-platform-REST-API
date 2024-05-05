@@ -42,4 +42,12 @@ const bodySexValidator = (sex: string) => {
     });
 };
 
+const bodyPasswordWhiteSpacesValidator = (psw: string) => {
+  return body(psw).custom((value) => {
+    if (/\s/.test(value)) {
+      throw new Error('Field cannot contain whitespaces.');
+    }
+  });
+};
+
 export { bodyDateValidator, bodySexValidator };
