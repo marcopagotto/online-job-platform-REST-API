@@ -50,4 +50,8 @@ const bodyPasswordWhiteSpacesValidator = (psw: string) => {
   });
 };
 
-export { bodyDateValidator, bodySexValidator };
+export {
+  bodyDateValidator,
+  bodySexValidator,
+  bodyPasswordWhiteSpacesValidator,
+};
