@@ -1,5 +1,7 @@
 import express from 'express';
 
+import { checkPoolConnection } from './db/connection';
+
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import apicache from 'apicache';
@@ -10,6 +12,8 @@ import 'express-async-errors';
 import { errorHandler } from './utils/errors';
 
 const app = express();
+
+checkPoolConnection();
 
 app.use(bodyParser.json());
 app.use(compression());
