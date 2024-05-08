@@ -1,4 +1,5 @@
 import { body } from 'express-validator';
+import { getUserByEmail } from '../models/users';
 
 const bodyDateValidator = (date: string, isBirthday = false) => {
   return body(date)
@@ -39,6 +40,8 @@ const bodySexValidator = (sex: string) => {
       if (!allowedValues.includes(value)) {
         throw new Error('Field must be either M, F, or O.');
       }
+
+      return true;
     });
 };
 
@@ -47,11 +50,28 @@ const bodyPasswordWhiteSpacesValidator = (psw: string) => {
     if (/\s/.test(value)) {
       throw new Error('Field cannot contain whitespaces.');
     }
+    return true;
   });
+};
+
+const existingEmailValidator = (email: string) => {
+  return body(email)
+    .trim()
+    .custom(async (value) => {
+      const user = await getUserByEmail(value);
+
+      if (user[0]) {
+        console.log(user);
+        throw new Error('User with email provided already exists.');
+      }
+
+      return true;
+    });
 };
 
 export {
   bodyDateValidator,
   bodySexValidator,
   bodyPasswordWhiteSpacesValidator,
+  existingEmailValidator,
 };
