@@ -3,23 +3,23 @@ import {
   bodyDateValidator,
   bodySexValidator,
   bodyPasswordWhiteSpacesValidator,
+  existingEmailValidator,
 } from '../utils/custom-validators';
 
-const userRegistrationSchema = [
+export const userRegistrationSchema = [
   body('forename')
-    .withMessage('Field must be between 1 and 100 characters long.')
     .trim()
     .notEmpty()
-    .isLength({ min: 1, max: 100 }),
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Field must be between 1 and 100 characters long.'),
   body('lastname')
-    .withMessage('Field must be between 1 and 100 characters long.')
     .trim()
     .notEmpty()
-    .isLength({ min: 1, max: 100 }),
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Field must be between 1 and 100 characters long.'),
   bodyDateValidator('birthdate', true).notEmpty(),
-  bodySexValidator('sex').notEmpty,
-  body('email')
-    .trim()
+  bodySexValidator('sex').notEmpty(),
+  existingEmailValidator('email')
     .notEmpty()
     .isEmail()
     .withMessage('Field must be a valid email address.')
