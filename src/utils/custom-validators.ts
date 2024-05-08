@@ -6,11 +6,11 @@ const bodyDateValidator = (date: string, isBirthday = false) => {
     .trim()
     .custom((value) => {
       const dateRegex =
-        /^(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])-(?:19\d{2}|20[01]\d|202[01])$/;
+        /^(?:19\d{2}|20[01]\d|202[01])-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$/;
 
       if (!dateRegex.test(value)) {
         throw new Error(
-          `Invalid ${date} format. ${date} must be in MM-DD-YYYY format with a valid date range.`
+          `Invalid ${date} format. ${date} must be in YYYY-MM-DD format with a valid date range.`
         );
       }
 
