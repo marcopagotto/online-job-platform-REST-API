@@ -6,7 +6,6 @@ export const getUserByEmail = async (email: string) => {
     'SELECT * FROM users WHERE email = ?',
     [email]
   );
-  console.log(user);
   return user;
 };
 
