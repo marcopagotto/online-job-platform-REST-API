@@ -1,6 +1,5 @@
 import express from 'express';
 
-import { checkPoolConnection } from './db/connection';
 
 import bodyParser from 'body-parser';
 import compression from 'compression';
@@ -14,7 +13,6 @@ import routes from './routes/index';
 
 const app = express();
 
-checkPoolConnection();
 
 app.use(bodyParser.json());
 app.use(compression());
