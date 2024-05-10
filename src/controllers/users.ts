@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { validationResult, matchedData } from 'express-validator';
 import { authentication, random } from '../utils/authentication';
-import { postUser, getUserByEmail, attachUserSessionToken } from '../models/users';
+import {
+  postUser,
+  getUserByEmail,
+  attachUserSessionToken,
+} from '../models/users';
 import { User } from '../interfaces/user';
 import { ApiError } from '../utils/errors';
 
@@ -72,5 +76,8 @@ export const authenticateUser = async (req: Request, res: Response) => {
     path: '/',
   });
 
-  res.sendStatus(200);
+  delete userWithSessionToken[0].salt;
+  delete userWithSessionToken[0].psw;
+
+  res.status(200).json(userWithSessionToken);
 };
