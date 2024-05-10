@@ -37,3 +37,11 @@ export const attachUserSessionToken = async (
 
   return result;
 };
+
+export const getUserBySessionToken = async (session_token: string) => {
+  const [user]: Array<Record<string, any>> = await pool.query(
+    'SELECT * FROM users WHERE session_token = ?',
+    [session_token]
+  );
+  return user;
+};
