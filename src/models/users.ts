@@ -26,3 +26,14 @@ export const postUser = async (user: Partial<User>) => {
   return result;
 };
 
+export const attachUserSessionToken = async (
+  user_id: string,
+  session_token: string
+) => {
+  const result = await pool.query(
+    'UPDATE users SET session_token = ? WHERE user_id = ?',
+    [session_token, user_id]
+  );
+
+  return result;
+};
