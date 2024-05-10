@@ -69,9 +69,25 @@ const existingEmailValidator = (email: string) => {
     });
 };
 
+const notExistingEmailValidator = (email: string) => {
+  return body(email)
+    .trim()
+    .custom(async (value) => {
+      const user = await getUserByEmail(value);
+
+      if (!user[0]) {
+        console.log(user);
+        throw new Error("User with email provided doesn't exists.");
+      }
+
+      return true;
+    });
+};
+
 export {
   bodyDateValidator,
   bodySexValidator,
   bodyPasswordWhiteSpacesValidator,
   existingEmailValidator,
+  notExistingEmailValidator
 };
