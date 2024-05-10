@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { validationResult, matchedData } from 'express-validator';
 import { authentication, random } from '../utils/authentication';
-import { postUser, getUserByEmail } from '../models/users';
+import { postUser, getUserByEmail, attachUserSessionToken } from '../models/users';
 import { User } from '../interfaces/user';
+import { ApiError } from '../utils/errors';
 
 export const createUser = async (req: Request, res: Response) => {
   const result = validationResult(req);
@@ -36,4 +37,40 @@ export const createUser = async (req: Request, res: Response) => {
   delete newUser[0].session_token;
 
   res.status(201).json(newUser);
+};
+
+export const authenticateUser = async (req: Request, res: Response) => {
+  const result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    return res.status(400).json(result);
+  }
+
+  const data: Partial<User> = matchedData(req);
+
+  const user = await getUserByEmail(data.email!);
+
+  const insertedPassword = authentication(user[0].salt, data.psw!);
+
+  if (insertedPassword !== user[0].psw) {
+    throw new ApiError(
+      'Password provided is incorrect. Check your input and try again.',
+      403
+    );
+  }
+
+  const salt = random();
+
+  const session_token = authentication(salt, user[0].user_id);
+
+  await attachUserSessionToken(user[0].user_id, session_token);
+
+  const userWithSessionToken = await getUserByEmail(data.email!);
+
+  res.cookie('AUTH-LOGIN', userWithSessionToken[0].session_token, {
+    domain: 'localhost',
+    path: '/',
+  });
+
+  res.sendStatus(200);
 };
