@@ -61,7 +61,6 @@ const existingEmailValidator = (email: string) => {
       const user = await getUserByEmail(value);
 
       if (user[0]) {
-        console.log(user);
         throw new Error('User with email provided already exists.');
       }
 
@@ -76,7 +75,6 @@ const notExistingEmailValidator = (email: string) => {
       const user = await getUserByEmail(value);
 
       if (!user[0]) {
-        console.log(user);
         throw new Error("User with email provided doesn't exists.");
       }
 
