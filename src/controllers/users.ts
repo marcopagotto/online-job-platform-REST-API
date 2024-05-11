@@ -5,6 +5,7 @@ import {
   postUser,
   getUserByEmail,
   attachUserSessionToken,
+  deleteUserById
 } from '../models/users';
 import { User } from '../interfaces/user';
 import { ApiError } from '../utils/errors';
@@ -80,4 +81,18 @@ export const authenticateUser = async (req: Request, res: Response) => {
   delete userWithSessionToken[0].psw;
 
   res.status(200).json(userWithSessionToken);
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+  const user = req.identity![0];
+
+  delete user.salt;
+  delete user.psw;
+  delete user.session_token;
+
+  await deleteUserById(user.user_id);
+
+  res.clearCookie('AUTH-LOGIN');
+
+  return res.status(202).json(user);
 };
