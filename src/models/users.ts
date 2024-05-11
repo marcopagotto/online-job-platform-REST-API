@@ -45,3 +45,10 @@ export const getUserBySessionToken = async (session_token: string) => {
   );
   return user;
 };
+
+export const deleteUserById = async (user_id: number) => {
+  const result = await pool.query('DELETE FROM users WHERE user_id = ?', [
+    user_id,
+  ]);
+  return result;
+};
