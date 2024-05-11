@@ -247,3 +247,76 @@ describe("PUT user's password", () => {
       .send(resetPassword);
   });
 });
+
+describe('DELETE user', () => {
+  it("Should return 401 if user isn't authenticated", async () => {
+    const response = await request(app).delete('/api/user');
+    expect(response.status).toBe(401);
+  });
+
+  it('Should return 202 if user was deleted correctly', async () => {
+    const email = generateRandomEmail();
+
+    const userRegistration = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userRegistration);
+
+    const userLogin = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(userLogin);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .delete('/api/user')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(202);
+  });
+
+  it('Should clear previous AUTH-LOGIN cookie', async () => {
+    const email = generateRandomEmail();
+
+    const userRegistration = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userRegistration);
+
+    const userLogin = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(userLogin);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .delete('/api/user')
+      .set('Cookie', cookie);
+
+    const authLoginCookieCleared = response.header['set-cookie'][0];
+
+    expect(authLoginCookieCleared.startsWith('AUTH-LOGIN=;')).toBe(true);
+  });
+});
