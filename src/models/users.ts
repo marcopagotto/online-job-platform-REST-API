@@ -52,3 +52,15 @@ export const deleteUserById = async (user_id: number) => {
   ]);
   return result;
 };
+
+export const updateUserPasswordById = async (
+  user_id: string,
+  password: string
+) => {
+  const result = await pool.query(
+    'UPDATE users SET psw = ? WHERE user_id = ?',
+    [password, user_id]
+  );
+
+  return result;
+};
