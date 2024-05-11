@@ -5,7 +5,8 @@ import {
   postUser,
   getUserByEmail,
   attachUserSessionToken,
-  deleteUserById
+  deleteUserById,
+  updateUserPasswordById,
 } from '../models/users';
 import { User } from '../interfaces/user';
 import { ApiError } from '../utils/errors';
@@ -95,4 +96,43 @@ export const deleteUser = async (req: Request, res: Response) => {
   res.clearCookie('AUTH-LOGIN');
 
   return res.status(202).json(user);
+};
+
+export const updateUserPassword = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors);
+  }
+
+  const data = matchedData(req);
+
+  const user = req.identity![0];
+
+  const salt = user.salt;
+  const currentEncryptedPassword = user.psw;
+
+  if (currentEncryptedPassword !== authentication(salt, data.oldPsw)) {
+    throw new ApiError(
+      'Old password is incorrect. Please check your input and try again',
+      403
+    );
+  }
+
+  const newEncryptedPassword = authentication(salt, data.newPsw);
+
+  if (currentEncryptedPassword === newEncryptedPassword) {
+    throw new ApiError(
+      'New password must be different from the previous one. Please check your input and try again',
+      400
+    );
+  }
+
+  await updateUserPasswordById(user.user_id, newEncryptedPassword);
+
+  res.clearCookie('AUTH-LOGIN');
+
+  return res
+    .status(200)
+    .json('Password updated correctly. Please login again.');
 };
