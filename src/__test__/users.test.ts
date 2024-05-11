@@ -164,3 +164,86 @@ describe('POST user authentication', () => {
     expect(response.header['set-cookie'][0].startsWith('AUTH-LOGIN'));
   });
 });
+
+describe("PUT user's password", () => {
+  it("Should return 401 if user isn't authenticated", async () => {
+    const response = await request(app).put('/api/user/update-password');
+    expect(response.status).toBe(401);
+  });
+
+  it('Should return 400 if user is authenticated but either oldPsw, newPsw or both are missing', async () => {
+    const user = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app).post('/api/user/login').send(user);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const changePassword = {};
+
+    const response = await request(app)
+      .put('/api/user/update-password')
+      .set('Cookie', cookie)
+      .send(changePassword);
+
+    expect(response.status).toBe(400);
+  });
+
+  it('Should return 403 if old password is wrong', async () => {
+    const user = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app).post('/api/user/login').send(user);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const changePassword = {
+      oldPsw: 'wrong_password',
+      newPsw: 'new_password',
+    };
+
+    const response = await request(app)
+      .put('/api/user/update-password')
+      .set('Cookie', cookie)
+      .send(changePassword);
+
+    expect(response.status).toBe(403);
+  });
+
+  it('Should return 200 if password was updated correctly', async () => {
+    const user = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app).post('/api/user/login').send(user);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const changePassword = {
+      oldPsw: 'password',
+      newPsw: 'new_password',
+    };
+
+    const response = await request(app)
+      .put('/api/user/update-password')
+      .set('Cookie', cookie)
+      .send(changePassword);
+
+    expect(response.status).toBe(200);
+
+    const resetPassword = {
+      oldPsw: 'new_password',
+      newPsw: 'password',
+    };
+
+    await request(app)
+      .put('/api/user/update-password')
+      .set('Cookie', cookie)
+      .send(resetPassword);
+  });
+});
