@@ -1,5 +1,7 @@
 import { body } from 'express-validator';
 import { getUserByEmail } from '../models/users';
+import { getCompanyByCompanyName } from '../models/companies';
+import { ApiError } from './errors';
 
 const bodyDateValidator = (date: string, isBirthday = false) => {
   return body(date)
@@ -82,10 +84,28 @@ const notExistingEmailValidator = (email: string) => {
     });
 };
 
+const existingCompanyValidator = (company_name: string) => {
+  return body(company_name)
+    .trim()
+    .custom(async (value) => {
+      const company = await getCompanyByCompanyName(value);
+
+      if (company[0][0]) {
+        throw new ApiError(
+          `${value} company is already registered. Please choose a different name and try again.`,
+          403
+        );
+      }
+
+      return true;
+    });
+};
+
 export {
   bodyDateValidator,
   bodySexValidator,
   bodyPasswordWhiteSpacesValidator,
   existingEmailValidator,
-  notExistingEmailValidator
+  notExistingEmailValidator,
+  existingCompanyValidator,
 };
