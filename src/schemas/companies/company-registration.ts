@@ -1,7 +1,7 @@
-import { body } from 'express-validator';
+import { existingCompanyValidator } from '../../utils/custom-validators';
 
 export const companyRegistrationSchema = [
-  body('company_name')
+  existingCompanyValidator('company_name')
     .notEmpty()
     .bail()
     .withMessage('Field must not be empty')
