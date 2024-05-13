@@ -320,3 +320,46 @@ describe('DELETE user', () => {
     expect(authLoginCookieCleared.startsWith('AUTH-LOGIN=;')).toBe(true);
   });
 });
+
+describe('GET user by id', () => {
+  it("Should return 401 if user isn't logged in", async () => {
+    const response = await request(app).get('/api/user/106');
+    expect(response.status).toBe(401);
+  });
+
+  it("Should return 404 if user is logged in but a user with the provided id doesn't exist", async () => {
+    const userLogin = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(userLogin);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/user/1')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(404);
+  });
+
+  it('Should return 200 if user is logged in and a user with the provided id exists', async () => {
+    const userLogin = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(userLogin);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/user/106')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(200);
+  });
+});
