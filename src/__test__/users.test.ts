@@ -327,6 +327,24 @@ describe('GET user by id', () => {
     expect(response.status).toBe(401);
   });
 
+  it("Should return 400 if id isn't a number", async() =>{
+    const userLogin = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(userLogin);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/user/NaN')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(400);
+  })
+
   it("Should return 404 if user is logged in but a user with the provided id doesn't exist", async () => {
     const userLogin = {
       email: 'example@email.com',
