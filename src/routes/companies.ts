@@ -7,7 +7,7 @@ import { registerCompany } from '../controllers/companies';
 
 export default (router: Router) => {
   router.post(
-    '/companies',
+    '/company',
     isAuthenticated,
     companyRegistrationSchema,
     registerCompany
