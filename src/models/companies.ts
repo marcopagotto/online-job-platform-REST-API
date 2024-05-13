@@ -20,3 +20,12 @@ export const getCompanyByCompanyName = async (company_name: string) => {
 
   return company;
 };
+
+export const getCompanyById = async (company_id: string) => {
+  const company: Record<string, any> = await pool.query(
+    'SELECT * FROM company WHERE company_id = ?',
+    [company_id]
+  );
+
+  return company;
+};
