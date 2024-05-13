@@ -7,6 +7,7 @@ import {
   attachUserSessionToken,
   deleteUserById,
   updateUserPasswordById,
+  getUserById as getUser,
 } from '../models/users';
 import { User } from '../interfaces/user';
 import { ApiError } from '../utils/errors';
@@ -135,4 +136,26 @@ export const updateUserPassword = async (req: Request, res: Response) => {
   return res
     .status(200)
     .json('Password updated correctly. Please login again.');
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors);
+  }
+
+  const data = matchedData(req);
+
+  const user = await getUser(data.user_id);
+
+  if (!user[0]) {
+    throw new ApiError(`No user found with id: ${data.user_id}.`, 404);
+  }
+
+  delete user[0].salt;
+  delete user[0].psw;
+  delete user[0].session_token;
+
+  return res.status(200).json(user);
 };
