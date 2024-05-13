@@ -4,13 +4,16 @@ import {
   authenticateUser,
   createUser,
   deleteUser,
+  getUserById,
   updateUserPassword,
 } from '../controllers/users';
 
 import { userRegistrationSchema } from '../schemas/user-registration';
 import { userAuthenticationSchema } from '../schemas/user-authentication';
-import { isAuthenticated } from '../middlewares/middlewares';
 import { userUpdatePasswordSchema } from '../schemas/user-update-password';
+import { userGetByIdSchema } from '../schemas/user-get-by-id';
+
+import { isAuthenticated } from '../middlewares/middlewares';
 
 export default (router: Router) => {
   router.post('/user', userRegistrationSchema, createUser);
@@ -22,4 +25,5 @@ export default (router: Router) => {
     userUpdatePasswordSchema,
     updateUserPassword
   );
+  router.get('/user/:user_id', isAuthenticated, userGetByIdSchema, getUserById);
 };
