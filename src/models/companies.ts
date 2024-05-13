@@ -11,3 +11,12 @@ export const registerCompany = async (
 
   return result;
 };
+
+export const getCompanyByCompanyName = async (company_name: string) => {
+  const company: Record<string, any> = await pool.query(
+    'SELECT * FROM company WHERE company_name = ?',
+    [company_name]
+  );
+
+  return company;
+};
