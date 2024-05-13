@@ -64,3 +64,12 @@ export const updateUserPasswordById = async (
 
   return result;
 };
+
+export const getUserById = async (user_id: string) => {
+  const [user]: Array<Record<string, any>> = await pool.query(
+    'SELECT * FROM users WHERE user_id = ?',
+    [user_id]
+  );
+
+  return user;
+};
