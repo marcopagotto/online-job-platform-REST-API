@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { notExistingEmailValidator } from '../utils/custom-validators';
+import { notExistingEmailValidator } from '../../utils/custom-validators';
 
 export const userAuthenticationSchema = [
   notExistingEmailValidator('email')

@@ -4,7 +4,7 @@ import {
   bodySexValidator,
   bodyPasswordWhiteSpacesValidator,
   existingEmailValidator,
-} from '../utils/custom-validators';
+} from '../../utils/custom-validators';
 
 export const userRegistrationSchema = [
   body('forename')

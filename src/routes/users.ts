@@ -8,10 +8,10 @@ import {
   updateUserPassword,
 } from '../controllers/users';
 
-import { userRegistrationSchema } from '../schemas/user-registration';
-import { userAuthenticationSchema } from '../schemas/user-authentication';
-import { userUpdatePasswordSchema } from '../schemas/user-update-password';
-import { userGetByIdSchema } from '../schemas/user-get-by-id';
+import { userRegistrationSchema } from '../schemas/users/user-registration';
+import { userAuthenticationSchema } from '../schemas/users/user-authentication';
+import { userUpdatePasswordSchema } from '../schemas/users/user-update-password';
+import { userGetByIdSchema } from '../schemas/users/user-get-by-id';
 
 import { isAuthenticated } from '../middlewares/middlewares';
 
