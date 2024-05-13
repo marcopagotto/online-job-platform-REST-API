@@ -52,3 +52,64 @@ describe('POST new company', () => {
     expect(response.status).toBe(201);
   });
 });
+
+describe('GET company by company id', () => {
+  it("Should return 401 if user isn't logged in", async () => {
+    const response = await request(app).get('/api/company/1');
+    expect(response.status).toBe(401);
+  });
+
+  it("Should return 400 if id isn't a number", async () => {
+    const userLogin = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(userLogin);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/company/NaN')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 404 if user is logged in but a company with the provided id doesn't exist", async () => {
+    const userLogin = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(userLogin);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/company/10000000')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(404);
+  });
+
+  it('Should return 200 if user is logged in and a company with the provided id exists', async () => {
+    const userLogin = {
+      email: 'example@email.com',
+      psw: 'password',
+    };
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(userLogin);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/company/1')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(200);
+  });
+});
