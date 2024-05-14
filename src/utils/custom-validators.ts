@@ -84,7 +84,7 @@ const notExistingEmailValidator = (email: string) => {
     });
 };
 
-const existingCompanyValidator = (company_name: string) => {
+const existingCompanyByNameValidator = (company_name: string) => {
   return body(company_name)
     .trim()
     .custom(async (value) => {
@@ -101,11 +101,13 @@ const existingCompanyValidator = (company_name: string) => {
     });
 };
 
+
+
 export {
   bodyDateValidator,
   bodySexValidator,
   bodyPasswordWhiteSpacesValidator,
   existingEmailValidator,
   notExistingEmailValidator,
-  existingCompanyValidator,
+  existingCompanyByNameValidator,
 };
