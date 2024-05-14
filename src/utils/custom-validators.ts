@@ -1,6 +1,6 @@
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { getUserByEmail } from '../models/users';
-import { getCompanyByCompanyName } from '../models/companies';
+import { getCompanyByCompanyName, getCompanyById } from '../models/companies';
 import { ApiError } from './errors';
 
 const bodyDateValidator = (date: string, isBirthday = false) => {
@@ -101,7 +101,25 @@ const existingCompanyByNameValidator = (company_name: string) => {
     });
 };
 
+const existingCompanyByIdValidator = (company_id: string) => {
+  return param(company_id)
+    .isInt()
+    .bail()
+    .withMessage('Value must be a number')
+    .trim()
+    .custom(async (value) => {
+      const company = await getCompanyById(value);
 
+      if (!company[0][0]) {
+        throw new ApiError(
+          `Company with id ${value} doesn't exist. Please check your input and try again.`,
+          403
+        );
+      }
+
+      return true;
+    });
+};
 
 export {
   bodyDateValidator,
