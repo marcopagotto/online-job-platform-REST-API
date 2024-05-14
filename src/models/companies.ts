@@ -29,3 +29,12 @@ export const getCompanyById = async (company_id: string) => {
 
   return company;
 };
+
+export const getCompaniesByOwnerId = async (company_owner: string) => {
+  const companies: Record<string, any> = await pool.query(
+    'SELECT * FROM company WHERE company_owner = ?',
+    [company_owner]
+  );
+
+  return companies;
+};
