@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --respawn src/server.ts",
+    "dev": "nodemon dist/server.js",
+    "tsc": "tsc -w",
     "test": "jest --detectOpenHandles"
   },
   "keywords": [],
