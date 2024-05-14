@@ -128,4 +128,5 @@ export {
   existingEmailValidator,
   notExistingEmailValidator,
   existingCompanyByNameValidator,
+  existingCompanyByIdValidator
 };
