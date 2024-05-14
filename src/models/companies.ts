@@ -38,3 +38,11 @@ export const getCompaniesByOwnerId = async (company_owner: string) => {
 
   return companies;
 };
+
+export const deleteCompanyById = async (company_id: string) => {
+  const result = await pool.query('DELETE FROM company WHERE company_id = ?', [
+    company_id,
+  ]);
+
+  return result;
+};
