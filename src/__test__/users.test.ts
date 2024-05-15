@@ -1,18 +1,23 @@
 import { app } from '../app';
 import request from 'supertest';
 import { generateRandomEmail } from '../utils/utils';
-import { getUserByEmail, getUserBySessionToken } from '../models/users';
+import {
+  deleteUserByEmail,
+  getUserByEmail,
+  getUserBySessionToken,
+} from '../models/users';
 
 describe('POST new user', () => {
   it('Should return 400 if all fields are missing', async () => {
-    const user = {};
+    const userBody = {};
 
-    const response = await request(app).post('/api/user').send(user);
+    const response = await request(app).post('/api/user').send(userBody);
+
     expect(response.status).toBe(400);
   });
 
   it('Should return 400 if any field is missing', async () => {
-    const user = {
+    const userBody = {
       lastname: 'lastname',
       sex: 'F',
       birthdate: '2000-12-12',
@@ -20,12 +25,13 @@ describe('POST new user', () => {
       psw: 'password',
     };
 
-    const response = await request(app).post('/api/user').send(user);
+    const response = await request(app).post('/api/user').send(userBody);
+
     expect(response.status).toBe(400);
   });
 
   it('Should return 400 if birthdate field is not provided in the right format', async () => {
-    const user = {
+    const userBody = {
       forename: 'name',
       lastname: 'lastname',
       sex: 'F',
@@ -34,12 +40,13 @@ describe('POST new user', () => {
       psw: 'password',
     };
 
-    const response = await request(app).post('/api/user').send(user);
+    const response = await request(app).post('/api/user').send(userBody);
+
     expect(response.status).toBe(400);
   });
 
   it('Should return 400 if birthdate is in the future', async () => {
-    const user = {
+    const userBody = {
       lastname: 'lastname',
       sex: 'F',
       birthdate: '3000-12-12',
@@ -47,137 +54,248 @@ describe('POST new user', () => {
       psw: 'password',
     };
 
-    const response = await request(app).post('/api/user').send(user);
+    const response = await request(app).post('/api/user').send(userBody);
+
     expect(response.status).toBe(400);
   });
 
   it('Should return 400 if a user with the provided email is already registered', async () => {
-    const user = {
+    const email = generateRandomEmail();
+
+    const userBody = {
       forename: 'forename',
       lastname: 'lastname',
       sex: 'F',
       birthdate: '2000-12-12',
-      email: 'example@email.com',
+      email: email,
       psw: 'password',
     };
 
-    const response = await request(app).post('/api/user').send(user);
+    await request(app).post('/api/user').send(userBody);
+
+    const response = await request(app).post('/api/user').send(userBody);
+
     expect(response.status).toBe(400);
+
+    await deleteUserByEmail(email);
   });
 
   it('Should return 201 if request is sent correctly', async () => {
-    const user = {
+    const email = generateRandomEmail();
+
+    const userBody = {
       forename: 'forename',
       lastname: 'lastname',
       sex: 'F',
       birthdate: '2000-12-12',
-      email: generateRandomEmail(),
+      email: email,
       psw: 'password',
     };
-    const response = await request(app).post('/api/user').send(user);
+
+    const response = await request(app).post('/api/user').send(userBody);
+
     expect(response.status).toBe(201);
+
+    await deleteUserByEmail(email);
   });
 });
 
 describe('POST user authentication', () => {
   it('Should return 400 if any field is missing', async () => {
-    const user = {
-      email: 'example@email.com',
-    };
-    const response = await request(app).post('/api/user/login').send(user);
+    const userBody = {};
+
+    const response = await request(app).post('/api/user/login').send(userBody);
+
     expect(response.status).toBe(400);
   });
 
   it('Should return 400 if no user with email provided is registered', async () => {
-    const user = {
-      email: 'example@email.com',
+    const userBody = {
+      email: generateRandomEmail(),
       password: 'password',
     };
-    const response = await request(app).post('/api/user/login').send(user);
+
+    const response = await request(app).post('/api/user/login').send(userBody);
+
     expect(response.status).toBe(400);
   });
 
   it('Should return 403 if password is incorrect', async () => {
-    const user = {
-      email: 'example@email.com',
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const wrongAuthUserBody = {
+      email: email,
       psw: 'wrong_password',
     };
-    const response = await request(app).post('/api/user/login').send(user);
+
+    const response = await request(app)
+      .post('/api/user/login')
+      .send(wrongAuthUserBody);
+
     expect(response.status).toBe(403);
+
+    await deleteUserByEmail(email);
   });
 
   it('Should return 200 if request is sent correctly', async () => {
-    const user = {
-      email: 'example@email.com',
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
       psw: 'password',
     };
-    const response = await request(app).post('/api/user/login').send(user);
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const response = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
     expect(response.status).toBe(200);
+
+    await deleteUserByEmail(email);
   });
 
   it("Should update user's previous session_token", async () => {
-    const userEmail = 'example@email.com';
+    const email = generateRandomEmail();
 
-    const previousUser = await getUserByEmail(userEmail);
-    const previousSessionToken = previousUser[0].session_token;
-
-    const userAuthentication = {
-      email: 'example@email.com',
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
       psw: 'password',
     };
 
-    await request(app).post('/api/user/login').send(userAuthentication);
+    await request(app).post('/api/user').send(userBody);
 
-    const currentUser = await getUserByEmail(userEmail);
-    const currentSessionToken = currentUser[0].session_token;
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const previousSessionToken = (
+      await request(app).post('/api/user/login').send(authUserBody)
+    ).body[0].session_token;
+
+    const currentSessionToken = (
+      await request(app).post('/api/user/login').send(authUserBody)
+    ).body[0].session_token;
 
     expect(previousSessionToken !== currentSessionToken);
+
+    await deleteUserByEmail(email);
   });
 
   it('User should be retrievable via session_token', async () => {
-    const userAuthentication = {
-      email: 'example@email.com',
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
       psw: 'password',
     };
 
-    const response = await request(app)
-      .post('/api/user/login')
-      .send(userAuthentication);
+    await request(app).post('/api/user').send(userBody);
 
-    const sessionToken = response.body[0].session_token;
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
 
-    const user = await getUserBySessionToken(sessionToken);
+    const sessionToken = (
+      await request(app).post('/api/user/login').send(authUserBody)
+    ).body[0].session_token;
 
-    expect(user[0].email === userAuthentication.email);
+    const retrievedUser = await getUserBySessionToken(sessionToken);
+
+    expect(retrievedUser[0].email === userBody.email);
+
+    await deleteUserByEmail(email);
   });
 
   it('Should attach an AUTH-LOGIN cookie to user', async () => {
-    const userAuthentication = {
-      email: 'example@email.com',
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
       psw: 'password',
     };
 
     const response = await request(app)
       .post('/api/user/login')
-      .send(userAuthentication);
+      .send(authUserBody);
 
     expect(response.header['set-cookie'][0].startsWith('AUTH-LOGIN'));
+
+    await deleteUserByEmail(email);
   });
 });
 
 describe("PUT user's password", () => {
   it("Should return 401 if user isn't authenticated", async () => {
     const response = await request(app).put('/api/user/update-password');
+
     expect(response.status).toBe(401);
   });
 
   it('Should return 400 if user is authenticated but either oldPsw, newPsw or both are missing', async () => {
-    const user = {
-      email: 'example@email.com',
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
       psw: 'password',
     };
 
-    const loginResponse = await request(app).post('/api/user/login').send(user);
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
 
     const cookie = loginResponse.header['set-cookie'][0];
 
@@ -189,75 +307,14 @@ describe("PUT user's password", () => {
       .send(changePassword);
 
     expect(response.status).toBe(400);
+
+    await deleteUserByEmail(email);
   });
 
   it('Should return 403 if old password is wrong', async () => {
-    const user = {
-      email: 'example@email.com',
-      psw: 'password',
-    };
-
-    const loginResponse = await request(app).post('/api/user/login').send(user);
-
-    const cookie = loginResponse.header['set-cookie'][0];
-
-    const changePassword = {
-      oldPsw: 'wrong_password',
-      newPsw: 'new_password',
-    };
-
-    const response = await request(app)
-      .put('/api/user/update-password')
-      .set('Cookie', cookie)
-      .send(changePassword);
-
-    expect(response.status).toBe(403);
-  });
-
-  it('Should return 200 if password was updated correctly', async () => {
-    const user = {
-      email: 'example@email.com',
-      psw: 'password',
-    };
-
-    const loginResponse = await request(app).post('/api/user/login').send(user);
-
-    const cookie = loginResponse.header['set-cookie'][0];
-
-    const changePassword = {
-      oldPsw: 'password',
-      newPsw: 'new_password',
-    };
-
-    const response = await request(app)
-      .put('/api/user/update-password')
-      .set('Cookie', cookie)
-      .send(changePassword);
-
-    expect(response.status).toBe(200);
-
-    const resetPassword = {
-      oldPsw: 'new_password',
-      newPsw: 'password',
-    };
-
-    await request(app)
-      .put('/api/user/update-password')
-      .set('Cookie', cookie)
-      .send(resetPassword);
-  });
-});
-
-describe('DELETE user', () => {
-  it("Should return 401 if user isn't authenticated", async () => {
-    const response = await request(app).delete('/api/user');
-    expect(response.status).toBe(401);
-  });
-
-  it('Should return 202 if user was deleted correctly', async () => {
     const email = generateRandomEmail();
 
-    const userRegistration = {
+    const userBody = {
       forename: 'forename',
       lastname: 'lastname',
       sex: 'F',
@@ -266,16 +323,104 @@ describe('DELETE user', () => {
       psw: 'password',
     };
 
-    await request(app).post('/api/user').send(userRegistration);
+    await request(app).post('/api/user').send(userBody);
 
-    const userLogin = {
+    const authUserBody = {
       email: email,
       psw: 'password',
     };
 
     const loginResponse = await request(app)
       .post('/api/user/login')
-      .send(userLogin);
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const changePasswordBody = {
+      oldPsw: 'wrong_password',
+      newPsw: 'new_password',
+    };
+
+    const response = await request(app)
+      .put('/api/user/update-password')
+      .set('Cookie', cookie)
+      .send(changePasswordBody);
+
+    expect(response.status).toBe(403);
+
+    await deleteUserByEmail(email);
+  });
+
+  it('Should return 200 if password was updated correctly', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const changePasswordBody = {
+      oldPsw: 'password',
+      newPsw: 'new_password',
+    };
+
+    const response = await request(app)
+      .put('/api/user/update-password')
+      .set('Cookie', cookie)
+      .send(changePasswordBody);
+
+    expect(response.status).toBe(200);
+
+    await deleteUserByEmail(email);
+  });
+});
+
+describe('DELETE user', () => {
+  it("Should return 401 if user isn't authenticated", async () => {
+    const response = await request(app).delete('/api/user');
+
+    expect(response.status).toBe(401);
+  });
+
+  it('Should return 202 if user was deleted correctly', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
 
     const cookie = loginResponse.header['set-cookie'][0];
 
@@ -289,7 +434,7 @@ describe('DELETE user', () => {
   it('Should clear previous AUTH-LOGIN cookie', async () => {
     const email = generateRandomEmail();
 
-    const userRegistration = {
+    const userBody = {
       forename: 'forename',
       lastname: 'lastname',
       sex: 'F',
@@ -298,16 +443,16 @@ describe('DELETE user', () => {
       psw: 'password',
     };
 
-    await request(app).post('/api/user').send(userRegistration);
+    await request(app).post('/api/user').send(userBody);
 
-    const userLogin = {
+    const authUserBody = {
       email: email,
       psw: 'password',
     };
 
     const loginResponse = await request(app)
       .post('/api/user/login')
-      .send(userLogin);
+      .send(authUserBody);
 
     const cookie = loginResponse.header['set-cookie'][0];
 
@@ -323,18 +468,33 @@ describe('DELETE user', () => {
 
 describe('GET user by id', () => {
   it("Should return 401 if user isn't logged in", async () => {
-    const response = await request(app).get('/api/user/106');
+    const response = await request(app).get('/api/user/1');
+
     expect(response.status).toBe(401);
   });
 
-  it("Should return 400 if id isn't a number", async() =>{
-    const userLogin = {
-      email: 'example@email.com',
+  it("Should return 400 if id isn't a number", async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
       psw: 'password',
     };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
     const loginResponse = await request(app)
       .post('/api/user/login')
-      .send(userLogin);
+      .send(authUserBody);
 
     const cookie = loginResponse.header['set-cookie'][0];
 
@@ -343,41 +503,76 @@ describe('GET user by id', () => {
       .set('Cookie', cookie);
 
     expect(response.status).toBe(400);
-  })
+
+    await deleteUserByEmail(email);
+  });
 
   it("Should return 404 if user is logged in but a user with the provided id doesn't exist", async () => {
-    const userLogin = {
-      email: 'example@email.com',
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
       psw: 'password',
     };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
     const loginResponse = await request(app)
       .post('/api/user/login')
-      .send(userLogin);
+      .send(authUserBody);
 
     const cookie = loginResponse.header['set-cookie'][0];
 
     const response = await request(app)
-      .get('/api/user/1')
+      .get('/api/user/999999')
       .set('Cookie', cookie);
 
     expect(response.status).toBe(404);
+
+    await deleteUserByEmail(email);
   });
 
   it('Should return 200 if user is logged in and a user with the provided id exists', async () => {
-    const userLogin = {
-      email: 'example@email.com',
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
       psw: 'password',
     };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
     const loginResponse = await request(app)
       .post('/api/user/login')
-      .send(userLogin);
+      .send(authUserBody);
 
+    const id = loginResponse.body[0].user_id;
     const cookie = loginResponse.header['set-cookie'][0];
 
     const response = await request(app)
-      .get('/api/user/106')
+      .get(`/api/user/${id}`)
       .set('Cookie', cookie);
 
     expect(response.status).toBe(200);
+
+    await deleteUserByEmail(email);
   });
 });
