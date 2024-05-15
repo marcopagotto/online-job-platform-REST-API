@@ -53,6 +53,11 @@ export const deleteUserById = async (user_id: number) => {
   return result;
 };
 
+export const deleteUserByEmail = async (email: string) => {
+  const result = await pool.query('DELETE FROM users WHERE email = ?', [email]);
+  return result;
+};
+
 export const updateUserPasswordById = async (
   user_id: string,
   password: string
