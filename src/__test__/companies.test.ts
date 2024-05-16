@@ -202,8 +202,6 @@ describe('GET company by company id', () => {
       await getCompanyByCompanyName(companyBody.company_name)
     )[0][0].company_id;
 
-    console.log(comapnyId);
-
     const response = await request(app)
       .get(`/api/company/${comapnyId}`)
       .set('Cookie', cookie);
