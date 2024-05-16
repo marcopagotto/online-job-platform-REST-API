@@ -1,7 +1,7 @@
-import { existingCompanyByIdValidator } from '../../utils/custom-validators';
+import { existingCompanyByIdParamValidator } from '../../utils/custom-validators';
 
 export const companyDeleteSchema = [
-  existingCompanyByIdValidator('company_id')
+  existingCompanyByIdParamValidator('company_id')
     .trim()
     .notEmpty()
     .bail()

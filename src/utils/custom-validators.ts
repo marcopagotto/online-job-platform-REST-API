@@ -101,7 +101,7 @@ const existingCompanyByNameValidator = (company_name: string) => {
     });
 };
 
-const existingCompanyByIdValidator = (company_id: string) => {
+const existingCompanyByIdParamValidator = (company_id: string) => {
   return param(company_id)
     .isInt()
     .bail()
@@ -128,5 +128,5 @@ export {
   existingEmailValidator,
   notExistingEmailValidator,
   existingCompanyByNameValidator,
-  existingCompanyByIdValidator
+  existingCompanyByIdParamValidator
 };
