@@ -24,3 +24,12 @@ export const getMostRecentListingByEmployerId = async (employer_id: string) => {
 
   return mostRecentListing;
 };
+
+export const getListingById = async (listing_id: string) => {
+  const listing: Record<string, any> = await pool.query(
+    'SELECT * FROM listing WHERE listing_id = ?',
+    [listing_id]
+  );
+
+  return listing;
+};
