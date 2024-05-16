@@ -121,6 +121,25 @@ const existingCompanyByIdParamValidator = (company_id: string) => {
     });
 };
 
+const existingCompanyByIdBodyValidator = (company_id: string) => {
+  return body(company_id)
+    .isInt()
+    .bail()
+    .withMessage('Value must be a number')
+    .trim()
+    .custom(async (value) => {
+      const company = await getCompanyById(value);
+      if (!company[0][0]) {
+        throw new ApiError(
+          `Company with id ${value} doesn't exist. Please check your input and try again.`,
+          403
+        );
+      }
+
+      return true;
+    });
+};
+
 export {
   bodyDateValidator,
   bodySexValidator,
@@ -128,5 +147,6 @@ export {
   existingEmailValidator,
   notExistingEmailValidator,
   existingCompanyByNameValidator,
-  existingCompanyByIdParamValidator
+  existingCompanyByIdParamValidator,
+  existingCompanyByIdBodyValidator,
 };
