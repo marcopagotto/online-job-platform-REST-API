@@ -15,3 +15,12 @@ export const createListing = async (listing: Partial<Listing>) => {
 
   return result;
 };
+
+export const getMostRecentListingByEmployerId = async (employer_id: string) => {
+  const mostRecentListing: Record<string, any> = await pool.query(
+    'SELECT * FROM listing WHERE employer_id = ? ORDER BY Posted_date DESC LIMIT 1',
+    [employer_id]
+  );
+
+  return mostRecentListing;
+};
