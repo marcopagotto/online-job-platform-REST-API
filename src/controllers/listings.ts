@@ -3,6 +3,7 @@ import { matchedData, validationResult } from 'express-validator';
 import {
   getMostRecentListingByEmployerId,
   createListing as newListing,
+  getListingById as getListing,
 } from '../models/listings';
 import { Listing } from '../interfaces/listing';
 import { getOwnerByCompanyId } from '../models/companies';
@@ -40,4 +41,22 @@ export const createListing = async (req: Request, res: Response) => {
   const listing = (await getMostRecentListingByEmployerId(data.employer_id))[0];
 
   return res.status(201).json(listing);
+};
+
+export const getListingById = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors);
+  }
+
+  const data = matchedData(req);
+
+  const listing = (await getListing(data.listing_id))[0];
+
+  if (!listing[0]) {
+    throw new ApiError(`No listing found with id: ${data.listing_id}.`, 404);
+  }
+
+  return res.status(200).json(listing);
 };
