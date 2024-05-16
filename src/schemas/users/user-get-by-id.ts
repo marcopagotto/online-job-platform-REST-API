@@ -2,6 +2,7 @@ import { param } from 'express-validator';
 
 export const userGetByIdSchema = [
   param('user_id')
+    .trim()
     .notEmpty()
     .bail()
     .withMessage('Field must not be empty')

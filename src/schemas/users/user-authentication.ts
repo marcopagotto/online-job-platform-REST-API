@@ -10,6 +10,7 @@ export const userAuthenticationSchema = [
     .bail()
     .withMessage('Email address must not exceed 255 characters.'),
   body('psw')
+    .trim()
     .notEmpty()
     .bail()
     .withMessage('Field must not be empty.')

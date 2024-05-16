@@ -2,6 +2,7 @@ import { existingCompanyByNameValidator } from '../../utils/custom-validators';
 
 export const companyRegistrationSchema = [
   existingCompanyByNameValidator('company_name')
+    .trim()
     .notEmpty()
     .bail()
     .withMessage('Field must not be empty')
