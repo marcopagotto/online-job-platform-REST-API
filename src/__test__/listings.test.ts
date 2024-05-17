@@ -3,7 +3,7 @@ import request from 'supertest';
 import { generateRandomEmail, generateRandomName } from '../utils/utils';
 import { deleteUserByEmail } from '../models/users';
 import { getCompanyByCompanyName } from '../models/companies';
-import { response } from 'express';
+import { getMostRecentListingByEmployerId } from '../models/listings';
 
 describe('POST listing', () => {
   it("Should return 401 if user isn't logged in", async () => {
@@ -98,7 +98,7 @@ describe('POST listing', () => {
       .set('Cookie', cookie1)
       .send(companyBody);
 
-    const comapnyId = (
+    const companyId = (
       await getCompanyByCompanyName(companyBody.company_name)
     )[0][0].company_id;
 
@@ -114,7 +114,7 @@ describe('POST listing', () => {
     const cookie2 = loginResponse2.header['set-cookie'][0];
 
     const listingBody = {
-      employer_id: comapnyId,
+      employer_id: companyId,
       job_title: 'job_title',
       description: 'job_description',
       remote: true,
@@ -164,12 +164,12 @@ describe('POST listing', () => {
       .set('Cookie', cookie)
       .send(companyBody);
 
-    const comapnyId = (
+    const companyId = (
       await getCompanyByCompanyName(companyBody.company_name)
     )[0][0].company_id;
 
     const listingBody = {
-      employer_id: comapnyId,
+      employer_id: companyId,
       job_title: 'job_title',
       description: 'job_description',
       remote: true,
@@ -182,6 +182,142 @@ describe('POST listing', () => {
       .send(listingBody);
 
     expect(response.status).toBe(201);
+
+    await deleteUserByEmail(email);
+  });
+});
+
+describe('GET listing by id', () => {
+  it("Should return 401 if user isn't logged in", async () => {
+    const response = await request(app).get('/api/listing/1');
+    expect(response.status).toBe(401);
+  });
+
+  it('Should return 400 if user is authenticated but invalid listing_id was provided', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/listing/NaN')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(400);
+
+    await deleteUserByEmail(email);
+  });
+
+  it('Should return 404 if user is authenticated but no listing with the provided id was found', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/listing/999999')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(404);
+
+    await deleteUserByEmail(email);
+  });
+
+  it('Should return 200 if user is authenticated and valid listing_id was provided', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const companyBody = { company_name: generateRandomName() };
+
+    await request(app)
+      .post('/api/company')
+      .set('Cookie', cookie)
+      .send(companyBody);
+
+    const companyId = (
+      await getCompanyByCompanyName(companyBody.company_name)
+    )[0][0].company_id;
+
+    const listingBody = {
+      employer_id: companyId,
+      job_title: 'job_title',
+      description: 'job_description',
+      remote: true,
+      annual_salary: '100000',
+    };
+
+    await request(app)
+      .post('/api/listing')
+      .set('Cookie', cookie)
+      .send(listingBody);
+
+    const listingId = (await getMostRecentListingByEmployerId(companyId))[0][0]
+      .listing_id;
+
+    const response = await request(app)
+      .get(`/api/listing/${listingId}`)
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(200);
 
     await deleteUserByEmail(email);
   });
