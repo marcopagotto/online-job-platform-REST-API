@@ -2,6 +2,7 @@ import { body, param } from 'express-validator';
 import { getUserByEmail } from '../models/users';
 import { getCompanyByCompanyName, getCompanyById } from '../models/companies';
 import { ApiError } from './errors';
+import { getListingById } from '../models/listings';
 
 const bodyDateValidator = (date: string, isBirthday = false) => {
   return body(date)
@@ -140,6 +141,23 @@ const existingCompanyByIdBodyValidator = (company_id: string) => {
     });
 };
 
+const existingListingByIdParamValidator = (listing_id: string) => {
+  return param(listing_id)
+    .isInt()
+    .bail()
+    .withMessage('Value must be a number')
+    .trim()
+    .custom(async (value) => {
+      const listing = await getListingById(value);
+      if (!listing[0][0]) {
+        throw new ApiError(
+          `Listing with id ${value} doesn't exist. Please check your input and try again.`,
+          403
+        );
+      }
+    });
+};
+
 export {
   bodyDateValidator,
   bodySexValidator,
@@ -149,4 +167,5 @@ export {
   existingCompanyByNameValidator,
   existingCompanyByIdParamValidator,
   existingCompanyByIdBodyValidator,
+  existingListingByIdParamValidator
 };
