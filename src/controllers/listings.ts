@@ -4,9 +4,10 @@ import {
   getMostRecentListingByEmployerId,
   createListing as newListing,
   getListingById as getListing,
+  deleteListingById
 } from '../models/listings';
 import { Listing } from '../interfaces/listing';
-import { getOwnerByCompanyId } from '../models/companies';
+import { getOwnerByCompanyId, getCompanyById } from '../models/companies';
 import { ApiError } from '../utils/errors';
 
 export const createListing = async (req: Request, res: Response) => {
@@ -59,4 +60,29 @@ export const getListingById = async (req: Request, res: Response) => {
   }
 
   return res.status(200).json(listing);
+};
+
+export const deleteListing = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors);
+  }
+
+  const data = matchedData(req);
+
+  const listing = (await getListing(data.listing_id))[0][0];
+
+  const company = (await getCompanyById(listing.employer_id))[0][0];
+
+  if (company.company_owner !== req.identity![0].user_id) {
+    throw new ApiError(
+      "User doesn't own the listing. Please check your input and retry.",
+      403
+    );
+  }
+
+  await deleteListingById(data.listing_id);
+
+  return res.status(201).json(listing);
 };
