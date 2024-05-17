@@ -33,3 +33,11 @@ export const getListingById = async (listing_id: string) => {
 
   return listing;
 };
+
+export const deleteListingById = async (listing_id: string) => {
+  const result = await pool.query('DELETE FROM listing WHERE listing_id = ?', [
+    listing_id,
+  ]);
+
+  return result;
+};
