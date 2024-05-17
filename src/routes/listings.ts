@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../middlewares/middlewares';
 import { listingPublishmentSchema } from '../schemas/listings/listing-publishment';
-import { createListing, getListingById } from '../controllers/listings';
+import {
+  createListing,
+  deleteListing,
+  getListingById,
+} from '../controllers/listings';
 import { listingGetByIdSchema } from '../schemas/listings/listing-get-by-id';
+import { listingDeleteSchema } from '../schemas/listings/listing-delete';
 
 export default (router: Router) => {
   router.post(
@@ -16,5 +21,11 @@ export default (router: Router) => {
     isAuthenticated,
     listingGetByIdSchema,
     getListingById
+  );
+  router.delete(
+    '/listing/:listing_id',
+    isAuthenticated,
+    listingDeleteSchema,
+    deleteListing
   );
 };
