@@ -41,3 +41,21 @@ export const deleteListingById = async (listing_id: string) => {
 
   return result;
 };
+
+export const updateListingById = async (
+  listing_id: string,
+  updatedListing: Partial<Listing>
+) => {
+  const result: Record<string, any> = await pool.query(
+    'UPDATE listing SET job_title = ?, description = ?, remote = ?, annual_salary = ? WHERE listing_id = ?',
+    [
+      updatedListing.job_title,
+      updatedListing.description,
+      updatedListing.remote,
+      updatedListing.annual_salary,
+      listing_id,
+    ]
+  );
+
+  return result;
+};
