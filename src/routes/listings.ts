@@ -5,9 +5,11 @@ import {
   createListing,
   deleteListing,
   getListingById,
+  updateListing,
 } from '../controllers/listings';
 import { listingGetByIdSchema } from '../schemas/listings/listing-get-by-id';
 import { listingDeleteSchema } from '../schemas/listings/listing-delete';
+import { listingUpdateSchema } from '../schemas/listings/listing-update';
 
 export default (router: Router) => {
   router.post(
@@ -27,5 +29,11 @@ export default (router: Router) => {
     isAuthenticated,
     listingDeleteSchema,
     deleteListing
+  );
+  router.put(
+    '/listing/:listing_id',
+    isAuthenticated,
+    listingUpdateSchema,
+    updateListing
   );
 };
