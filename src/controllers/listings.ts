@@ -4,7 +4,8 @@ import {
   getMostRecentListingByEmployerId,
   createListing as newListing,
   getListingById as getListing,
-  deleteListingById
+  deleteListingById,
+  updateListingById,
 } from '../models/listings';
 import { Listing } from '../interfaces/listing';
 import { getOwnerByCompanyId, getCompanyById } from '../models/companies';
@@ -85,4 +86,36 @@ export const deleteListing = async (req: Request, res: Response) => {
   await deleteListingById(data.listing_id);
 
   return res.status(201).json(listing);
+};
+
+export const updateListing = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors);
+  }
+
+  const data = matchedData(req);
+
+  const listing = (await getListing(data.listing_id))[0][0];
+
+  const company = (await getCompanyById(listing.employer_id))[0][0];
+
+  if (company.company_owner !== req.identity![0].user_id) {
+    throw new ApiError(
+      "User doesn't own the listing. Please check your input and retry.",
+      403
+    );
+  }
+
+  const updatedListing = listing;
+
+  updatedListing.job_title = data.job_title || listing.job_title;
+  updatedListing.description = data.description || listing.description;
+  updatedListing.annual_salary = data.annual_salary || listing.annual_salary;
+  updatedListing.remote = data.remote || listing.remote;
+
+  await updateListingById(data.listing_id, updatedListing);
+
+  return res.json((await getListing(data.listing_id))[0]);
 };
