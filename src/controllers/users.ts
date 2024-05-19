@@ -8,6 +8,7 @@ import {
   deleteUserById,
   updateUserPasswordById,
   getUserById as getUser,
+  updateUserById
 } from '../models/users';
 import { User } from '../interfaces/user';
 import { ApiError } from '../utils/errors';
@@ -158,4 +159,32 @@ export const getUserById = async (req: Request, res: Response) => {
   delete user[0].session_token;
 
   return res.status(200).json(user);
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors);
+  }
+
+  const data = matchedData(req);
+
+  const user = req.identity![0];
+
+  const updatedUser = user;
+
+  updatedUser.forename = data.forename || user.forename;
+  updatedUser.lastname = data.lastname || user.lastname;
+  updatedUser.birthdate = data.birthdate || user.birthdate;
+  updatedUser.sex = data.sex || user.sex;
+
+  await updateUserById(user.user_id, updatedUser);
+
+  const currentUser = (await getUser(user.user_id))[0];
+
+  delete currentUser.psw;
+  delete currentUser.salt;
+
+  return res.status(200).json(currentUser);
 };
