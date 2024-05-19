@@ -766,7 +766,6 @@ describe('GET listings', () => {
       .get('/api/listings?newFirst=0')
       .set('Cookie', cookie);
 
-    console.log(response.body);
     expect(response.status).toBe(200);
 
     await deleteUserByEmail(email);
