@@ -59,3 +59,21 @@ export const updateListingById = async (
 
   return result;
 };
+
+export const getListings = async (amount: number, newFirst: number) => {
+  if (newFirst) {
+    const listings: Record<string, any> = await pool.query(
+      'SELECT * FROM listing ORDER BY Posted_date DESC LIMIT ?',
+      [amount]
+    );
+
+    return listings;
+  } else {
+    const listings: Record<string, any> = await pool.query(
+      'SELECT * FROM listing LIMIT ?',
+      [amount]
+    );
+
+    return listings;
+  }
+};
