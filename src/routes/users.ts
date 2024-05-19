@@ -21,12 +21,12 @@ export default (router: Router) => {
   router.post('/user', userRegistrationSchema, createUser);
   router.post('/user/login', userAuthenticationSchema, authenticateUser);
   router.delete('/user', isAuthenticated, deleteUser);
-  router.put(
+  router.patch(
     '/user/update-password',
     isAuthenticated,
     userUpdatePasswordSchema,
     updateUserPassword
   );
   router.get('/user/:user_id', isAuthenticated, userGetByIdSchema, getUserById);
-  router.put('/user', isAuthenticated, userUpdateSchema, updateUser);
+  router.patch('/user', isAuthenticated, userUpdateSchema, updateUser);
 };

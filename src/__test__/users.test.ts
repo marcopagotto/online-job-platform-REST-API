@@ -267,9 +267,9 @@ describe('POST user authentication', () => {
   });
 });
 
-describe("PUT user's password", () => {
+describe("PATCH user's password", () => {
   it("Should return 401 if user isn't authenticated", async () => {
-    const response = await request(app).put('/api/user/update-password');
+    const response = await request(app).patch('/api/user/update-password');
 
     expect(response.status).toBe(401);
   });
@@ -302,7 +302,7 @@ describe("PUT user's password", () => {
     const changePassword = {};
 
     const response = await request(app)
-      .put('/api/user/update-password')
+      .patch('/api/user/update-password')
       .set('Cookie', cookie)
       .send(changePassword);
 
@@ -342,7 +342,7 @@ describe("PUT user's password", () => {
     };
 
     const response = await request(app)
-      .put('/api/user/update-password')
+      .patch('/api/user/update-password')
       .set('Cookie', cookie)
       .send(changePasswordBody);
 
@@ -382,7 +382,7 @@ describe("PUT user's password", () => {
     };
 
     const response = await request(app)
-      .put('/api/user/update-password')
+      .patch('/api/user/update-password')
       .set('Cookie', cookie)
       .send(changePasswordBody);
 
@@ -577,9 +577,9 @@ describe('GET user by id', () => {
   });
 });
 
-describe('PUT user', () => {
+describe('PATCH user', () => {
   it("Should return 401 if user isn't logged in", async () => {
-    const response = await request(app).put('/api/user');
+    const response = await request(app).patch('/api/user');
 
     expect(response.status).toBe(401);
   });
@@ -617,7 +617,7 @@ describe('PUT user', () => {
     };
 
     const respone = await request(app)
-      .put('/api/user')
+      .patch('/api/user')
       .set('Cookie', cookie)
       .send(invalidUpdateUserBody);
 
@@ -657,7 +657,7 @@ describe('PUT user', () => {
     };
 
     const respone = await request(app)
-      .put('/api/user')
+      .patch('/api/user')
       .set('Cookie', cookie)
       .send(validUpdateUserBody);
 

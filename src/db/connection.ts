@@ -1,5 +1,6 @@
 import mysql from 'mysql2';
 import config from '../config/config';
+import { toLower } from 'lodash';
 
 export const pool = mysql
   .createPool({
@@ -29,9 +30,9 @@ export const initTablesIfNotExisting = async () => {
   try {
     const [tables]: Array<any> = await pool.query('SHOW TABLES');
 
-    const tables_in_db = `Tables_in_${config.mysql.databaseName}`;
-    
-    const tableNames = tables.map((table: any) => table.tables_in_db);
+    const tables_in_db = `Tables_in_${toLower(config.mysql.databaseName)}`;
+
+    const tableNames = tables.map((table: any) => table[tables_in_db]);
 
     if (!tableNames.includes('users')) {
       await pool.query(`

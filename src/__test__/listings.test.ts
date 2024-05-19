@@ -507,9 +507,9 @@ describe('DELETE listing', () => {
   });
 });
 
-describe('PUT listing', () => {
+describe('PATCH listing', () => {
   it("Should return 401 if user isn't logged in", async () => {
-    const response = await request(app).put('/api/listing/1');
+    const response = await request(app).patch('/api/listing/1');
     expect(response.status).toBe(401);
   });
 
@@ -539,7 +539,7 @@ describe('PUT listing', () => {
     const cookie = loginResponse.header['set-cookie'][0];
 
     const response = await request(app)
-      .put('/api/listing/999999')
+      .patch('/api/listing/999999')
       .set('Cookie', cookie);
 
     expect(response.status).toBe(400);
@@ -621,7 +621,7 @@ describe('PUT listing', () => {
       .listing_id;
 
     const response = await request(app)
-      .put(`/api/listing/${listingId}`)
+      .patch(`/api/listing/${listingId}`)
       .set('Cookie', cookie2);
 
     expect(response.status).toBe(403);
@@ -681,14 +681,14 @@ describe('PUT listing', () => {
 
     const listingId = postListingResponse.body[0].listing_id;
 
-    const putListingBody = {
+    const patchListingBody = {
       job_title: 'newTitle',
     };
 
     const response = await request(app)
-      .put(`/api/listing/${listingId}`)
+      .patch(`/api/listing/${listingId}`)
       .set('Cookie', cookie)
-      .send(putListingBody);
+      .send(patchListingBody);
 
     expect(response.status).toBe(200);
 

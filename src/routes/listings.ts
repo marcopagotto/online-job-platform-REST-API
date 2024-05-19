@@ -32,7 +32,7 @@ export default (router: Router) => {
     listingDeleteSchema,
     deleteListing
   );
-  router.put(
+  router.patch(
     '/listing/:listing_id',
     isAuthenticated,
     listingUpdateSchema,
