@@ -695,3 +695,80 @@ describe('PUT listing', () => {
     await deleteUserByEmail(email);
   });
 });
+
+describe('GET listings', () => {
+  it("Should return 401 if user isn't logged in", async () => {
+    const response = await request(app).get('/api/listings');
+
+    expect(response.status).toBe(401);
+  });
+
+  it('Should return 400 if user is authenticated but is providing an invalid query value', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/listings?newFirst=invalid_value')
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(400);
+
+    await deleteUserByEmail(email);
+  });
+
+  it('Should return 200 if user is authenticated and is providing valid query values', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const response = await request(app)
+      .get('/api/listings?newFirst=0')
+      .set('Cookie', cookie);
+
+    console.log(response.body);
+    expect(response.status).toBe(200);
+
+    await deleteUserByEmail(email);
+  });
+});
