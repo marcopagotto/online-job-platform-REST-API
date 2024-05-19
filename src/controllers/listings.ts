@@ -6,6 +6,7 @@ import {
   getListingById as getListing,
   deleteListingById,
   updateListingById,
+  getListings as getListingsQuery,
 } from '../models/listings';
 import { Listing } from '../interfaces/listing';
 import { getOwnerByCompanyId, getCompanyById } from '../models/companies';
@@ -118,4 +119,23 @@ export const updateListing = async (req: Request, res: Response) => {
   await updateListingById(data.listing_id, updatedListing);
 
   return res.json((await getListing(data.listing_id))[0]);
+};
+
+export const getListings = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors);
+  }
+
+  const data = matchedData(req);
+
+  const listings = (
+    await getListingsQuery(
+      data.amount ? Number(data.amount) : 10,
+      data.newFirst ? Number(data.newFirst) : 0
+    )
+  )[0];
+
+  return res.status(200).json(listings);
 };
