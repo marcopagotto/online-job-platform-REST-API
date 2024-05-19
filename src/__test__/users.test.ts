@@ -576,3 +576,93 @@ describe('GET user by id', () => {
     await deleteUserByEmail(email);
   });
 });
+
+describe('PUT user', () => {
+  it("Should return 401 if user isn't logged in", async () => {
+    const response = await request(app).put('/api/user');
+
+    expect(response.status).toBe(401);
+  });
+
+  it('Should return 400 if user is authenticated but is providing a body violating the schema', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const invalidUpdateUserBody = {
+      forename: '',
+      lastname: '',
+      sex: 'L',
+      birthdate: '20-12-12',
+    };
+
+    const respone = await request(app)
+      .put('/api/user')
+      .set('Cookie', cookie)
+      .send(invalidUpdateUserBody);
+
+    expect(respone.status).toBe(400);
+
+    await deleteUserByEmail(email);
+  });
+
+  it('Should return 200 if user is authenticated and is providing a valid body', async () => {
+    const email = generateRandomEmail();
+
+    const userBody = {
+      forename: 'forename',
+      lastname: 'lastname',
+      sex: 'F',
+      birthdate: '2000-12-12',
+      email: email,
+      psw: 'password',
+    };
+
+    await request(app).post('/api/user').send(userBody);
+
+    const authUserBody = {
+      email: email,
+      psw: 'password',
+    };
+
+    const loginResponse = await request(app)
+      .post('/api/user/login')
+      .send(authUserBody);
+
+    const cookie = loginResponse.header['set-cookie'][0];
+
+    const validUpdateUserBody = {
+      forename: 'new_forename',
+      lastname: 'new_lastname',
+    };
+
+    const respone = await request(app)
+      .put('/api/user')
+      .set('Cookie', cookie)
+      .send(validUpdateUserBody);
+
+    expect(respone.status).toBe(200);
+
+    await deleteUserByEmail(email);
+  });
+});
