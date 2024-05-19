@@ -182,6 +182,26 @@ const queryAmountValidator = (amount: string) => {
     });
 };
 
+const queryNewFirstValidator = (newFirst: string) => {
+  return query(newFirst)
+    .optional()
+    .trim()
+    .notEmpty()
+    .bail()
+    .withMessage('Field must not be empty.')
+    .bail()
+    .custom((value) => {
+      if (Number(value) !== 0 && Number(value) !== 1) {
+        throw new ApiError(
+          'Value must be boolean (1,0). Please check your input and try again.',
+          400
+        );
+      }
+
+      return true;
+    });
+};
+
 export {
   bodyDateValidator,
   bodySexValidator,
@@ -193,4 +213,5 @@ export {
   existingCompanyByIdBodyValidator,
   existingListingByIdParamValidator,
   queryAmountValidator,
+  queryNewFirstValidator
 };
