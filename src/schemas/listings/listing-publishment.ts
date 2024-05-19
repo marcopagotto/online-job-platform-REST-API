@@ -35,9 +35,9 @@ export const listingPublishmentSchema = [
     .notEmpty()
     .bail()
     .withMessage('Field must not be empty.')
-    .isLength({ min: 1, max: 4 })
+    .isLength({ min: 1, max: 5 })
     .bail()
-    .withMessage('Field must be between 1 and 4 characters long.')
+    .withMessage('Field must be between 1 and 5 characters long.')
     .isBoolean()
     .bail()
     .withMessage('Value must be boolean (1,0, true or false).'),
