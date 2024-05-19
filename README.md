@@ -6,24 +6,14 @@ Online Job Platform REST API is an open source platform which enables a user bas
 
 ### Technologies Used
 
-Online Job Platfrom REST API is based on [TypeScript](https://www.typescriptlang.org/), [NodeJS](https://nodejs.org/), [ExpressJS](https://www.expresjs.org/), [MySql](https://www.mysql.com/) and [expres-validator](https://express-validator.github.io/docs/).
+Online Job Platfrom REST API is based on [TypeScript](https://www.typescriptlang.org/), [NodeJS](https://nodejs.org/), [ExpressJS](https://expressjs.com/), [MySql](https://www.mysql.com/) and [expres-validator](https://express-validator.github.io/docs/).
 
 <div style="display: flex; justify-content: center;">
-  <a href="https://www.typescriptlang.org/">
     <img style="width: 50px; height: 50px; margin-right: 20px;" src="https://static-00.iconduck.com/assets.00/typescript-icon-icon-1024x1024-vh3pfez8.png" alt="TS" />
-  </a>
-  <a href="https://nodejs.org/">
     <img style="width: 45px; height: 50px; margin-right: 20px;" src="https://static-00.iconduck.com/assets.00/node-js-icon-454x512-nztofx17.png" alt="NodeJS" />
-  </a>
-  <a href="https://www.expresjs.org/">
     <img style="width: 100px; height: 50px; margin-right: 20px;" src="https://www.vectorlogo.zone/logos/expressjs/expressjs-ar21.svg" alt="express" />
-  </a>
-  <a href="https://www.mysql.com/">
     <img style="width: 100px; height: 50px; margin-right: 20px;" src="https://static-00.iconduck.com/assets.00/mysql-original-wordmark-icon-2048x1064-jfbaqrzh.png" alt="MySql" />
-  </a>
-  <a href="https://express-validator.github.io/docs/">
     <img style="width: 50px; height: 50px;" src="https://express-validator.github.io/img/logo.svg" alt="express-validator" />
-  </a>
 </div>
 
 ### Installation Guide

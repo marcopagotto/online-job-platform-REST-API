@@ -70,7 +70,7 @@ export const initTablesIfNotExisting = async () => {
           description VARCHAR(1000) NOT NULL,
           posted_date TIMESTAMP NOT NULL DEFAULT NOW(),
           annual_salary INT NOT NULL,
-          remote VARCHAR(4) NOT NULL,
+          remote VARCHAR(5) NOT NULL,
           FOREIGN KEY (employer_id) REFERENCES company(company_id) ON DELETE CASCADE
         )
       `);
