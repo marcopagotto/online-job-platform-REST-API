@@ -5,6 +5,7 @@ import {
   createUser,
   deleteUser,
   getUserById,
+  updateUser,
   updateUserPassword,
 } from '../controllers/users';
 
@@ -14,6 +15,7 @@ import { userUpdatePasswordSchema } from '../schemas/users/user-update-password'
 import { userGetByIdSchema } from '../schemas/users/user-get-by-id';
 
 import { isAuthenticated } from '../middlewares/middlewares';
+import { userUpdateSchema } from '../schemas/users/user-update-schema';
 
 export default (router: Router) => {
   router.post('/user', userRegistrationSchema, createUser);
@@ -26,4 +28,5 @@ export default (router: Router) => {
     updateUserPassword
   );
   router.get('/user/:user_id', isAuthenticated, userGetByIdSchema, getUserById);
+  router.put('/user', isAuthenticated, userUpdateSchema, updateUser);
 };
