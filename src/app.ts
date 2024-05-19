@@ -1,6 +1,5 @@
 import express from 'express';
 
-
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import apicache from 'apicache';
@@ -10,9 +9,11 @@ import 'express-async-errors';
 
 import { errorHandler } from './utils/errors';
 import routes from './routes/index';
+import { initTablesIfNotExisting } from './db/connection';
 
 const app = express();
 
+initTablesIfNotExisting();
 
 app.use(bodyParser.json());
 app.use(compression());
