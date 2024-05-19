@@ -78,3 +78,21 @@ export const getUserById = async (user_id: string) => {
 
   return user;
 };
+
+export const updateUserById = async (
+  user_id: string,
+  updatedUser: Partial<User>
+) => {
+  const result: Record<string, any> = await pool.query(
+    'UPDATE users SET forename = ?, lastname = ?, birthdate = ?, sex = ? WHERE user_id = ?',
+    [
+      updatedUser.forename,
+      updatedUser.lastname,
+      updatedUser.birthdate,
+      updatedUser.sex,
+      user_id,
+    ]
+  );
+
+  return result;
+};
