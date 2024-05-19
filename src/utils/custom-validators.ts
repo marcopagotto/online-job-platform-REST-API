@@ -1,4 +1,4 @@
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import { getUserByEmail } from '../models/users';
 import { getCompanyByCompanyName, getCompanyById } from '../models/companies';
 import { ApiError } from './errors';
@@ -155,6 +155,30 @@ const existingListingByIdParamValidator = (listing_id: string) => {
           403
         );
       }
+
+      return true;
+    });
+};
+
+const queryAmountValidator = (amount: string) => {
+  return query(amount)
+    .optional()
+    .trim()
+    .notEmpty()
+    .bail()
+    .withMessage('Field must not be empty.')
+    .isInt()
+    .bail()
+    .withMessage('Value must be a number')
+    .custom((value) => {
+      if (Number(value) <= 0) {
+        throw new ApiError(
+          'Value must be <= 0. Please check your input and try again.',
+          400
+        );
+      }
+
+      return true;
     });
 };
 
@@ -167,5 +191,6 @@ export {
   existingCompanyByNameValidator,
   existingCompanyByIdParamValidator,
   existingCompanyByIdBodyValidator,
-  existingListingByIdParamValidator
+  existingListingByIdParamValidator,
+  queryAmountValidator,
 };
