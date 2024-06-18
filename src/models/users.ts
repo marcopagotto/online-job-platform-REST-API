@@ -3,7 +3,7 @@ import { User } from '../interfaces/user';
 
 export const getUserByEmail = async (email: string) => {
   const [user]: Array<Record<string, any>> = await pool.query(
-    'SELECT * FROM users WHERE email = ?',
+    'SELECT * FROM user WHERE email = ?',
     [email]
   );
   return user;
@@ -11,7 +11,7 @@ export const getUserByEmail = async (email: string) => {
 
 export const postUser = async (user: Partial<User>) => {
   const result = await pool.query(
-    'INSERT INTO users (forename, lastname, birthdate, sex, email, salt, psw) VALUES (?, ?, ? ,? ,? ,?, ?)',
+    'INSERT INTO user (forename, lastname, birthdate, sex, email, salt, psw) VALUES (?, ?, ? ,? ,? ,?, ?)',
     [
       user.forename,
       user.lastname,
@@ -31,7 +31,7 @@ export const attachUserSessionToken = async (
   session_token: string
 ) => {
   const result = await pool.query(
-    'UPDATE users SET session_token = ? WHERE user_id = ?',
+    'UPDATE user SET session_token = ? WHERE user_id = ?',
     [session_token, user_id]
   );
 
@@ -40,21 +40,21 @@ export const attachUserSessionToken = async (
 
 export const getUserBySessionToken = async (session_token: string) => {
   const [user]: Array<Record<string, any>> = await pool.query(
-    'SELECT * FROM users WHERE session_token = ?',
+    'SELECT * FROM user WHERE session_token = ?',
     [session_token]
   );
   return user;
 };
 
 export const deleteUserById = async (user_id: number) => {
-  const result = await pool.query('DELETE FROM users WHERE user_id = ?', [
+  const result = await pool.query('DELETE FROM user WHERE user_id = ?', [
     user_id,
   ]);
   return result;
 };
 
 export const deleteUserByEmail = async (email: string) => {
-  const result = await pool.query('DELETE FROM users WHERE email = ?', [email]);
+  const result = await pool.query('DELETE FROM user WHERE email = ?', [email]);
   return result;
 };
 
@@ -63,7 +63,7 @@ export const updateUserPasswordById = async (
   password: string
 ) => {
   const result = await pool.query(
-    'UPDATE users SET psw = ? WHERE user_id = ?',
+    'UPDATE user SET psw = ? WHERE user_id = ?',
     [password, user_id]
   );
 
@@ -72,7 +72,7 @@ export const updateUserPasswordById = async (
 
 export const getUserById = async (user_id: string) => {
   const [user]: Array<Record<string, any>> = await pool.query(
-    'SELECT * FROM users WHERE user_id = ?',
+    'SELECT * FROM user WHERE user_id = ?',
     [user_id]
   );
 
@@ -84,7 +84,7 @@ export const updateUserById = async (
   updatedUser: Partial<User>
 ) => {
   const result: Record<string, any> = await pool.query(
-    'UPDATE users SET forename = ?, lastname = ?, birthdate = ?, sex = ? WHERE user_id = ?',
+    'UPDATE user SET forename = ?, lastname = ?, birthdate = ?, sex = ? WHERE user_id = ?',
     [
       updatedUser.forename,
       updatedUser.lastname,

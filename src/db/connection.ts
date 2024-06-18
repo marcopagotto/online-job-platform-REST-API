@@ -34,9 +34,9 @@ export const initTablesIfNotExisting = async () => {
 
     const tableNames = tables.map((table: any) => table[tables_in_db]);
 
-    if (!tableNames.includes('users')) {
+    if (!tableNames.includes('user')) {
       await pool.query(`
-        CREATE TABLE users (
+        CREATE TABLE user (
           user_id INT PRIMARY KEY AUTO_INCREMENT,
           forename VARCHAR(50) NOT NULL,
           lastname VARCHAR(50) NOT NULL,
@@ -56,7 +56,7 @@ export const initTablesIfNotExisting = async () => {
           company_id INT PRIMARY KEY AUTO_INCREMENT,
           company_name VARCHAR(50) UNIQUE NOT NULL,
           company_owner INT NOT NULL,
-          FOREIGN KEY (company_owner) REFERENCES users(user_id) ON DELETE CASCADE
+          FOREIGN KEY (company_owner) REFERENCES user(user_id) ON DELETE CASCADE
         )
       `);
     }
