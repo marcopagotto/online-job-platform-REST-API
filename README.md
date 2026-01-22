@@ -8,13 +8,6 @@ Online Job Platform REST API is an open source platform which enables a user bas
 
 Online Job Platfrom REST API is based on [TypeScript](https://www.typescriptlang.org/), [NodeJS](https://nodejs.org/), [ExpressJS](https://expressjs.com/) and [MySql](https://www.mysql.com/).
 
-<div style="display: flex; justify-content: center;">
-    <img style="width: 50px; height: 50px; margin-right: 20px;" src="https://static-00.iconduck.com/assets.00/typescript-icon-icon-1024x1024-vh3pfez8.png" alt="TS" />
-    <img style="width: 45px; height: 50px; margin-right: 20px;" src="https://static-00.iconduck.com/assets.00/node-js-icon-454x512-nztofx17.png" alt="NodeJS" />
-    <img style="width: 100px; height: 50px; margin-right: 20px;" src="https://www.vectorlogo.zone/logos/expressjs/expressjs-ar21.svg" alt="express" />
-    <img style="width: 100px; height: 50px; margin-right: 20px;" src="https://static-00.iconduck.com/assets.00/mysql-original-wordmark-icon-2048x1064-jfbaqrzh.png" alt="MySql" />
-</div>
-
 ### Installation Guide
 
 1. Clone this repository [here](https://github.com/marcopagotto/online-job-platform-REST-API.git)
